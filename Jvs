@@ -1,0 +1,361 @@
+// Project data
+const projects = [
+  {
+    title: "Private Villa",
+    desc: "Contemporary residence in New Cairo",
+    img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+    fullImg: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+  },
+  {
+    title: "Urban Residence",
+    desc: "Minimalist city living",
+    img: "https://images.unsplash.com/photo-1494526585095-c41746248156?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+    fullImg: "https://images.unsplash.com/photo-1494526585095-c41746248156?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+  },
+  {
+    title: "Commercial Complex",
+    desc: "Mixed-use development",
+    img: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+    fullImg: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+  },
+  {
+    title: "Cultural Center",
+    desc: "Community landmark",
+    img: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+    fullImg: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+  }
+];
+
+// Render projects
+const projectsGrid = document.getElementById('projectsGrid');
+projects.forEach(proj => {
+  const card = document.createElement('div');
+  card.classList.add('project-card');
+  card.innerHTML = `
+    <img class="project-img" src="${proj.img}" alt="${proj.title}" loading="lazy">
+    <div class="project-info">
+      <h3>${proj.title}</h3>
+      <p>${proj.desc}</p>
+    </div>
+  `;
+  card.addEventListener('click', () => openLightbox(proj.fullImg));
+  projectsGrid.appendChild(card);
+});
+
+// Lightbox functionality
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.querySelector('.lightbox-img');
+function openLightbox(imgSrc) {
+  lightboxImg.src = imgSrc;
+  lightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  lightbox.classList.remove('active');
+  document.body.style.overflow = 'auto';
+}
+document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', (e) => {
+  if (e.target === lightbox) closeLightbox();
+});
+
+// Mobile menu toggle
+const menuToggle = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
+menuToggle.addEventListener('click', () => {
+  const expanded = menuToggle.getAttribute('aria-expanded') === 'true' ? false : true;
+  menuToggle.setAttribute('aria-expanded', expanded);
+  navLinks.classList.toggle('active');
+});
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', () => {
+    navLinks.classList.remove('active');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  });
+});
+
+// Smooth scroll & active nav highlight
+const sections = document.querySelectorAll('section');
+const navItems = document.querySelectorAll('.nav-links a');
+function updateActiveNav() {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 100;
+    const sectionBottom = sectionTop + section.offsetHeight;
+    if (window.scrollY >= sectionTop && window.scrollY < sectionBottom) {
+      current = section.getAttribute('id');
+    }
+  });
+  navItems.forEach(item => {
+    item.classList.remove('active');
+    if (item.getAttribute('href') === `#${current}`) {
+      item.classList.add('active');
+    }
+  });
+}
+window.addEventListener('scroll', updateActiveNav);
+updateActiveNav();
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const targetId = this.getAttribute('href').substring(1);
+    if (!targetId) return;
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+
+// Back to top
+const backToTop = document.querySelector('.back-to-top');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 500) {
+    backToTop.classList.add('visible');
+  } else {
+    backToTop.classList.remove('visible');
+  }
+});
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Scroll animations (Intersection Observer)
+const fadeElements = document.querySelectorAll('.fade-up');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.2 });
+fadeElements.forEach(el => observer.observe(el));
+
+// Contact form (Formspree)
+const form = document.getElementById('contactForm');
+const formStatus = document.getElementById('formStatus');
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        formStatus.innerHTML = '<span class="success">✅ Message sent successfully! We\'ll get back to you soon.</span>';
+        form.reset();
+      } else {
+        throw new Error('Formspree error');
+      }
+    } catch (error) {
+      formStatus.innerHTML = '<span class="error">❌ Oops! Something went wrong. Please try again later.</span>';
+    }
+  });
+}import React, { useState, useEffect, useRef } from 'react';
+import './App.css';
+
+// Project data
+const projectsData = [
+  { id: 1, title: 'Private Villa', desc: 'Contemporary residence in New Cairo', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', fullImg: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80' },
+  { id: 2, title: 'Urban Residence', desc: 'Minimalist city living', img: 'https://images.unsplash.com/photo-1494526585095-c41746248156?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', fullImg: 'https://images.unsplash.com/photo-1494526585095-c41746248156?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80' },
+  { id: 3, title: 'Commercial Complex', desc: 'Mixed-use development', img: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', fullImg: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80' },
+  { id: 4, title: 'Cultural Center', desc: 'Community landmark', img: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80', fullImg: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80' }
+];
+
+function App() {
+  const [activeSection, setActiveSection] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentImg, setCurrentImg] = useState('');
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formStatus, setFormStatus] = useState({ type: '', message: '' });
+  const [formLoading, setFormLoading] = useState(false);
+
+  // Track active section
+  useEffect(() => {
+    const sections = document.querySelectorAll('section');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        });
+      },
+      { threshold: 0.3 }
+    );
+    sections.forEach((section) => observer.observe(section));
+    return () => sections.forEach((section) => observer.unobserve(section));
+  }, []);
+
+  // Scroll animations
+  useEffect(() => {
+    const fadeElements = document.querySelectorAll('.fade-up');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      },
+      { threshold: 0.2 }
+    );
+    fadeElements.forEach((el) => observer.observe(el));
+    return () => fadeElements.forEach((el) => observer.unobserve(el));
+  }, []);
+
+  const scrollTo = (id) => {
+    const element = document.getElementById(id);
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
+    setMenuOpen(false);
+  };
+
+  const openLightbox = (img) => {
+    setCurrentImg(img);
+    setLightboxOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    document.body.style.overflow = 'auto';
+  };
+
+  const handleFormChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormStatus({ type: '', message: '' });
+    // Replace with your Formspree endpoint
+    const actionUrl = 'https://formspree.io/f/YOUR_FORMSPREE_ID';
+    try {
+      const response = await fetch(actionUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (response.ok) {
+        setFormStatus({ type: 'success', message: '✅ Message sent successfully!' });
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        throw new Error('Formspree error');
+      }
+    } catch (error) {
+      setFormStatus({ type: 'error', message: '❌ Something went wrong. Please try again later.' });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  return (
+    <div className="app">
+      {/* Navbar */}
+      <nav className="navbar">
+        <div className="container nav-container">
+          <h1 className="logo" onClick={() => scrollTo('hero')}>STUDIO SERAG</h1>
+          <button className="menu-toggle" aria-label="Menu" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
+          <ul className={`nav-links ${menuOpen ? 'open' : ''}`}>
+            <li><button className={activeSection === 'work' ? 'active' : ''} onClick={() => scrollTo('work')}>Work</button></li>
+            <li><button className={activeSection === 'about' ? 'active' : ''} onClick={() => scrollTo('about')}>Studio</button></li>
+            <li><button className={activeSection === 'contact' ? 'active' : ''} onClick={() => scrollTo('contact')}>Contact</button></li>
+          </ul>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section id="hero" className="hero">
+        <div className="container hero-content">
+          <h2>Designing Timeless<br />Architecture</h2>
+          <p>Architecture Engineer | Modern • Minimal • Functional</p>
+        </div>
+      </section>
+
+      {/* Projects */}
+      <section id="work">
+        <div className="container">
+          <h2 className="section-title fade-up">Selected Work</h2>
+          <div className="projects-grid">
+            {projectsData.map((project) => (
+              <div key={project.id} className="project-card fade-up" onClick={() => openLightbox(project.fullImg)}>
+                <img src={project.img} alt={project.title} className="project-img" loading="lazy" />
+                <div className="project-info">
+                  <h3>{project.title}</h3>
+                  <p>{project.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About */}
+      <section id="about">
+        <div className="container">
+          <h2 className="section-title fade-up">Studio</h2>
+          <div className="about-text fade-up">
+            <p>We design architecture that responds to context, function, and human experience. Our approach blends minimalism with precision, delivering spaces that are both aesthetically refined and highly functional.</p>
+            <br />
+            <p>Based in Cairo, working globally — we believe every project tells a unique story through light, material, and form.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section id="contact">
+        <div className="container">
+          <h2 className="section-title fade-up">Contact</h2>
+          <div className="contact-form fade-up">
+            <form onSubmit={handleFormSubmit}>
+              <div className="form-group">
+                <input type="text" name="name" placeholder="Your Name" value={formData.name} onChange={handleFormChange} required />
+              </div>
+              <div className="form-group">
+                <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleFormChange} required />
+              </div>
+              <div className="form-group">
+                <textarea name="message" rows="5" placeholder="Tell us about your project..." value={formData.message} onChange={handleFormChange} required />
+              </div>
+              <button type="submit" className="btn" disabled={formLoading}>{formLoading ? 'Sending...' : 'Submit Inquiry'}</button>
+              {formStatus.message && <div className={`form-status ${formStatus.type}`}>{formStatus.message}</div>}
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer>
+        <div className="container footer-content">
+          <div className="social-links">
+            <a href="#" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
+            <a href="#" aria-label="Behance"><i className="fab fa-behance"></i></a>
+          </div>
+          <p>© 2026 STUDIO SERAG — Architecture & Design</p>
+        </div>
+      </footer>
+
+      {/* Back to top */}
+      <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>↑</button>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div className="lightbox" onClick={closeLightbox}>
+          <span className="lightbox-close">&times;</span>
+          <div className="lightbox-content">
+            <img src={currentImg} alt="Enlarged view" className="lightbox-img" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css'; // optional, you can keep default or delete
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
