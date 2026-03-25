@@ -1,0 +1,87 @@
+architecture-portfolio/
+│
+├── client/   (React Frontend)
+└── server/   (Node Backend)
+import React from "react";
+import "./styles.css";
+
+function App() {
+  return (
+    <div className="app">
+
+      {/* NAV */}
+      <nav>
+        <h1>YOUR NAME</h1>
+        <div>
+          <a href="#work">Work</a>
+          <a href="#about">Studio</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-content">
+          <h2>Designing Timeless Architecture</h2>
+          <p>Modern • Minimal • Functional</p>
+        </div>
+      </section>
+
+      {/* PROJECTS */}
+      <section id="work" className="projects">
+        <div className="project">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" />
+          <h3>Private Villa</h3>
+        </div>
+
+        <div className="project">
+          <img src="https://images.unsplash.com/photo-1494526585095-c41746248156" />
+          <h3>Urban Residence</h3>
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="about">
+        <h2>Studio</h2>
+        <p>
+          Architecture engineer creating modern, functional, and refined spaces.
+        </p>
+      </section>
+
+      {/* CONTACT */}
+      <section id="contact" className="contact">
+        <h2>Contact</h2>
+
+        <form onSubmit={handleSubmit}>
+          <input name="name" placeholder="Name" required />
+          <input name="email" placeholder="Email" required />
+          <textarea name="message" placeholder="Project details" required />
+          <button type="submit">Send</button>
+        </form>
+      </section>
+
+    </div>
+  );
+}
+
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  const form = new FormData(e.target);
+
+  const data = {
+    name: form.get("name"),
+    email: form.get("email"),
+    message: form.get("message"),
+  };
+
+  await fetch("http://localhost:5000/contact", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  alert("Message sent");
+}
+
+export default App;
